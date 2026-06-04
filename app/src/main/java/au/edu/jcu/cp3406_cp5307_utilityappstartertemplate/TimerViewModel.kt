@@ -19,7 +19,8 @@ data class TimerState(
     val breakDurationMinutes: Int = 5,
     val sessionsCompleted: Int = 0,
     val totalFocusMinutesToday: Int = 0,
-    val soundEnabled: Boolean = true
+    val soundEnabled: Boolean = true,
+    val quote: String = "Loading quote..."
 )
 
 class TimerViewModel : ViewModel() {
@@ -28,6 +29,17 @@ class TimerViewModel : ViewModel() {
     val state: StateFlow<TimerState> = _state
 
     private var timerJob: Job? = null
+
+    init {
+        fetchQuote()
+    }
+
+    private fun fetchQuote() {
+        viewModelScope.launch {
+            val quote = QuoteRepository.fetchQuote()
+            _state.value = _state.value.copy(quote = quote)
+        }
+    }
 
     fun start() {
         if (_state.value.isRunning) return
