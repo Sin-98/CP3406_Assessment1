@@ -277,8 +277,8 @@ fun SettingsScreen(
         Slider(
             value = state.focusDurationMinutes.toFloat(),
             onValueChange = { viewModel.setFocusDuration(it.toInt()) },
-            valueRange = 5f..60f,
-            steps = 10
+            valueRange = 5f..180f,
+            steps = 34
         )
 
         HorizontalDivider()
