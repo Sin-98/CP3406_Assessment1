@@ -1,5 +1,7 @@
 package au.edu.jcu.cp3406_cp5307_utilityappstartertemplate
 
+import android.media.MediaPlayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.collectAsState
@@ -26,6 +28,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -99,6 +102,14 @@ fun UtilityApp(viewModel: TimerViewModel = viewModel()) {
 @Composable
 fun UtilityScreen(viewModel: TimerViewModel) {
     val state by viewModel.state.collectAsState()
+
+    val context = LocalContext.current
+    LaunchedEffect(state.secondsRemaining) {
+        if (state.secondsRemaining == 0 && state.soundEnabled) {
+            val mediaPlayer = MediaPlayer.create(context, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI)
+            mediaPlayer?.start()
+        }
+    }
 
     val minutes = state.secondsRemaining / 60
     val seconds = state.secondsRemaining % 60
