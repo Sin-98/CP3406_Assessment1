@@ -36,6 +36,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.edu.jcu.cp3406_cp5307_utilityappstartertemplate.ui.theme.CP3406_CP5603UtilityAppStarterTemplateTheme
@@ -176,26 +181,70 @@ fun UtilityScreen(viewModel: TimerViewModel) {
             )
         }
 
-        // Daily stats
-        Text("Today's Stats", style = MaterialTheme.typography.titleMedium)
-        Row(
+        // Streak banner
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFAEEDA)),
+            shape = RoundedCornerShape(10.dp)
         ) {
-            StatCard(label = "Sessions", value = "${state.sessionsCompleted}")
-            StatCard(label = "Focus Time", value = "${state.totalFocusMinutesToday} min")
+            Row(
+                modifier = Modifier.padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Icon(
+                    Icons.Default.LocalFireDepartment,
+                    contentDescription = null,
+                    tint = Color(0xFFBA7517),
+                    modifier = Modifier.size(24.dp)
+                )
+                Column {
+                    Text(
+                        "${state.currentStreak}-day streak",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 13.sp,
+                        color = Color(0xFF633806)
+                    )
+                    Text(
+                        "Keep it going — don't break the chain!",
+                        fontSize = 10.sp,
+                        color = Color(0xFF854F0B)
+                    )
+                }
+            }
+        }
+
+// Expanded 4-card stats grid
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            StatCard("Sessions", "${state.sessionsCompleted}", Modifier.weight(1f))
+            StatCard("Focus time", "${state.totalFocusMinutesToday} min", Modifier.weight(1f), teal = true)
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            StatCard("Best streak", "${state.bestStreak}", Modifier.weight(1f), amber = true)
+            StatCard("Total sessions", "${state.totalSessionsAllTime}", Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-fun StatCard(label: String, value: String) {
-    Card(modifier = Modifier.padding(4.dp)) {
+fun StatCard(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    teal: Boolean = false,
+    amber: Boolean = false
+) {
+    val valueColor = when {
+        teal -> Color(0xFF0F6E56)
+        amber -> Color(0xFF854F0B)
+        else -> MaterialTheme.colorScheme.primary
+    }
+    Card(modifier = modifier.padding(4.dp)) {
         Column(
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(value, style = MaterialTheme.typography.titleLarge)
+            Text(value, style = MaterialTheme.typography.titleLarge, color = valueColor)
             Text(label, style = MaterialTheme.typography.bodySmall)
         }
     }

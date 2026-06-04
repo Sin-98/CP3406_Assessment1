@@ -20,7 +20,11 @@ data class TimerState(
     val sessionsCompleted: Int = 0,
     val totalFocusMinutesToday: Int = 0,
     val soundEnabled: Boolean = true,
-    val quote: String = "Loading quote..."
+    val quote: String = "Loading quote...",
+    val currentStreak: Int = 5,
+    val bestStreak: Int = 8,
+    val lastActiveDate: String = "",   // store as "yyyy-MM-dd"
+    val totalSessionsAllTime: Int = 47
 )
 
 class TimerViewModel : ViewModel() {
@@ -71,6 +75,7 @@ class TimerViewModel : ViewModel() {
     private fun onTimerFinished() {
         val s = _state.value
         if (s.mode == TimerMode.FOCUS) {
+            updateStreak()
             _state.value = s.copy(
                 isRunning = false,
                 mode = TimerMode.BREAK,
@@ -109,5 +114,28 @@ class TimerViewModel : ViewModel() {
 
     fun setSoundEnabled(enabled: Boolean) {
         _state.value = _state.value.copy(soundEnabled = enabled)
+    }
+
+    private fun updateStreak() {
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val today = sdf.format(java.util.Date())
+        val s = _state.value
+
+        // Calculate yesterday's date string
+        val cal = java.util.Calendar.getInstance()
+        cal.add(java.util.Calendar.DAY_OF_MONTH, -1)
+        val yesterday = sdf.format(cal.time)
+
+        val newStreak = when (s.lastActiveDate) {
+            today -> s.currentStreak
+            yesterday -> s.currentStreak + 1
+            else -> 1
+        }
+        _state.value = _state.value.copy(
+            currentStreak = newStreak,
+            bestStreak = maxOf(newStreak, s.bestStreak),
+            lastActiveDate = today,
+            totalSessionsAllTime = s.totalSessionsAllTime + 1
+        )
     }
 }
