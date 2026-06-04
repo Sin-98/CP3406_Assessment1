@@ -58,32 +58,39 @@ fun UtilityAppPreview() {
 }
 
 @Composable
-fun UtilityApp() {
-    val viewModel: TimerViewModel = viewModel()
+fun UtilityApp(viewModel: TimerViewModel = viewModel()) {
+    val state by viewModel.state.collectAsState()
     var selectedTab by remember { mutableStateOf("Utility") }
+    var isDarkMode by remember { mutableStateOf(false) }
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Utility") },
-                    label = { Text("Utility") },
-                    selected = selectedTab == "Utility",
-                    onClick = { selectedTab = "Utility" }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                    label = { Text("Settings") },
-                    selected = selectedTab == "Settings",
-                    onClick = { selectedTab = "Settings" }
-                )
+    CP3406_CP5603UtilityAppStarterTemplateTheme(darkTheme = isDarkMode) {
+        Scaffold(
+            bottomBar = {
+                NavigationBar {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Home, contentDescription = "Utility") },
+                        label = { Text("Utility") },
+                        selected = selectedTab == "Utility",
+                        onClick = { selectedTab = "Utility" }
+                    )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                        label = { Text("Settings") },
+                        selected = selectedTab == "Settings",
+                        onClick = { selectedTab = "Settings" }
+                    )
+                }
             }
-        }
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            when (selectedTab) {
-                "Utility" -> UtilityScreen(viewModel)
-                "Settings" -> SettingsScreen(viewModel)
+        ) { innerPadding ->
+            Box(modifier = Modifier.padding(innerPadding)) {
+                when (selectedTab) {
+                    "Utility" -> UtilityScreen(viewModel)
+                    "Settings" -> SettingsScreen(
+                        viewModel = viewModel,
+                        isDarkMode = isDarkMode,
+                        onDarkModeToggle = { isDarkMode = it }
+                    )
+                }
             }
         }
     }
@@ -184,7 +191,11 @@ fun StatCard(label: String, value: String) {
 }
 
 @Composable
-fun SettingsScreen(viewModel: TimerViewModel) {
+fun SettingsScreen(
+    viewModel: TimerViewModel,
+    isDarkMode: Boolean,
+    onDarkModeToggle: (Boolean) -> Unit
+) {
     val state by viewModel.state.collectAsState()
 
     Column(
@@ -234,6 +245,16 @@ fun SettingsScreen(viewModel: TimerViewModel) {
                 checked = state.soundEnabled,
                 onCheckedChange = { viewModel.setSoundEnabled(it) }
             )
+        }
+
+        HorizontalDivider()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Dark Mode", style = MaterialTheme.typography.titleMedium)
+            Switch(checked = isDarkMode, onCheckedChange = onDarkModeToggle)
         }
     }
 }
