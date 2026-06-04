@@ -72,6 +72,11 @@ class TimerViewModel : ViewModel() {
         _state.value = s.copy(isRunning = false, secondsRemaining = total, totalSeconds = total)
     }
 
+    fun skip() {
+        timerJob?.cancel()
+        onTimerFinished()
+    }
+
     private fun onTimerFinished() {
         val s = _state.value
         if (s.mode == TimerMode.FOCUS) {

@@ -164,6 +164,9 @@ fun UtilityScreen(viewModel: TimerViewModel) {
             OutlinedButton(onClick = { viewModel.reset() }) {
                 Text("Reset")
             }
+            OutlinedButton(onClick = { viewModel.skip() }) {
+                Text("Skip")
+            }
         }
 
         HorizontalDivider()
