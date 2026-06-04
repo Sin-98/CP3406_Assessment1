@@ -83,7 +83,7 @@ fun UtilityApp() {
         Box(modifier = Modifier.padding(innerPadding)) {
             when (selectedTab) {
                 "Utility" -> UtilityScreen(viewModel)
-                "Settings" -> SettingsScreen()
+                "Settings" -> SettingsScreen(viewModel)
             }
         }
     }
@@ -184,13 +184,56 @@ fun StatCard(label: String, value: String) {
 }
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(viewModel: TimerViewModel) {
+    val state by viewModel.state.collectAsState()
+
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp), Arrangement.spacedBy(16.dp)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Text("Settings Screen", style = MaterialTheme.typography.headlineMedium)
-        Text("This is where you can add toggles or preferences.")
+        Text("Settings", style = MaterialTheme.typography.headlineMedium)
+
+        // Focus duration slider
+        Text(
+            "Focus Duration: ${state.focusDurationMinutes} min",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Slider(
+            value = state.focusDurationMinutes.toFloat(),
+            onValueChange = { viewModel.setFocusDuration(it.toInt()) },
+            valueRange = 5f..60f,
+            steps = 10
+        )
+
+        HorizontalDivider()
+
+        // Break duration slider
+        Text(
+            "Break Duration: ${state.breakDurationMinutes} min",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Slider(
+            value = state.breakDurationMinutes.toFloat(),
+            onValueChange = { viewModel.setBreakDuration(it.toInt()) },
+            valueRange = 1f..30f,
+            steps = 5
+        )
+
+        HorizontalDivider()
+
+        // Sound toggle
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Sound Notifications", style = MaterialTheme.typography.titleMedium)
+            Switch(
+                checked = state.soundEnabled,
+                onCheckedChange = { viewModel.setSoundEnabled(it) }
+            )
+        }
     }
 }
