@@ -17,6 +17,9 @@ Study Focus Timer App is an Android application designed to help students improv
 - Adjustable focus/break durations
 - Motivational quotes
 - Dark/light mode
+- User account with saved username
+- Daily focus goals with progress tracking
+- Achievement badges awarded automatically on goal completion
 
 ---
 
@@ -26,6 +29,9 @@ Study Focus Timer App is an Android application designed to help students improv
 - Retrofit + Gson for API calls
 - Jetpack Compose
 - ViewModel
+- Room (local database for goals and badges)
+- DataStore Preferences (persistent user profile)
+- KSP (Kotlin Symbol Processing for Room)
 
 ---
 
@@ -37,15 +43,37 @@ Study Focus Timer App is an Android application designed to help students improv
 5. Users can pause, reset, or skip sessions as needed.
 6. Focus and break durations can be adjusted in the app's settings to suit your schedule. 
 7. Repeat the cycle to maintain productive study habits.
+8. Visit the Account tab to set your name and a daily focus goal (in minutes).
+9. Progress toward your goal is tracked automatically after each focus session.
+10. Visit the Badges tab to view earned achievements; locked badges are revealed as goals are completed.
 
 ---
+
+### App Structure
+```
+MainActivity.kt         — Navigation and screen routing
+TimerViewModel.kt       — Timer logic and session state
+AccountViewModel.kt     — Goal tracking and badge awarding
+AccountScreen.kt        — Profile and daily goal UI
+BadgesScreen.kt         — Badge gallery (locked/unlocked)
+GoalEntity.kt           — Room entity for daily goals
+BadgeEntity.kt          — Room entity for earned badges
+AppDao.kt               — Database queries
+AppDatabase.kt          — Room database setup
+UserPreferences.kt      — DataStore for username
+BadgeType.kt            — Badge definitions and criteria
+QuoteRepository.kt      — Motivational quotes via Retrofit
+```
+
+---
+
 ### Future Improvements
-- Session history & stats — Track completed sessions, total focus time, and daily/weekly streaks
 - Custom session labels — Let users name sessions (e.g. "Math", "Reading") for better tracking
 - Notification customization — Choose different sounds or vibration patterns per session type
 - Cloud sync — Back up settings and session history across devices
 - Accessibility improvements — TalkBack support, larger text options, high contrast mode
 - Lock screen timer — Display the countdown on the lock screen so users don't need to unlock their phone
+- More badge types — Weekly challenges, total hours milestones, and more
 
 ---
 
