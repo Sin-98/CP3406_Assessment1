@@ -77,10 +77,15 @@ class TimerViewModel : ViewModel() {
         onTimerFinished()
     }
 
+    // Add this property to hold a reference set from outside
+    var onFocusSessionComplete: ((Int) -> Unit)? = null
+
     private fun onTimerFinished() {
         val s = _state.value
         if (s.mode == TimerMode.FOCUS) {
             updateStreak()
+            // ← This is where the badge/goal system gets notified
+            onFocusSessionComplete?.invoke(s.focusDurationMinutes)
             _state.value = s.copy(
                 isRunning = false,
                 mode = TimerMode.BREAK,
@@ -98,7 +103,6 @@ class TimerViewModel : ViewModel() {
             )
         }
     }
-
     fun setFocusDuration(minutes: Int) {
         val s = _state.value
         _state.value = s.copy(

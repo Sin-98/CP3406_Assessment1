@@ -43,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import au.edu.jcu.cp3406_cp5307_utilityappstartertemplate.ui.theme.CP3406_CP5603UtilityAppStarterTemplateTheme
 
 class MainActivity : ComponentActivity() {
@@ -66,10 +68,19 @@ fun UtilityAppPreview() {
 }
 
 @Composable
-fun UtilityApp(viewModel: TimerViewModel = viewModel()) {
-    val state by viewModel.state.collectAsState()
+fun UtilityApp(
+    timerViewModel: TimerViewModel = viewModel(),
+    accountViewModel: AccountViewModel = viewModel()
+) {
+    val state by timerViewModel.state.collectAsState()
     var selectedTab by remember { mutableStateOf("Utility") }
     var isDarkMode by remember { mutableStateOf(false) }
+    // Wire timer → account: when a focus session ends, log minutes for goal/badge tracking
+    LaunchedEffect(timerViewModel, accountViewModel) {
+        timerViewModel.onFocusSessionComplete = { minutes ->
+            accountViewModel.addFocusMinutes(minutes)
+        }
+    }
 
     CP3406_CP5603UtilityAppStarterTemplateTheme(darkTheme = isDarkMode) {
         Scaffold(
@@ -82,6 +93,18 @@ fun UtilityApp(viewModel: TimerViewModel = viewModel()) {
                         onClick = { selectedTab = "Utility" }
                     )
                     NavigationBarItem(
+                        icon = { Icon(Icons.Default.Person, contentDescription = "Account") },
+                        label = { Text("Account") },
+                        selected = selectedTab == "Account",
+                        onClick = { selectedTab = "Account" }
+                    )
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Star, contentDescription = "Badges") },
+                        label = { Text("Badges") },
+                        selected = selectedTab == "Badges",
+                        onClick = { selectedTab = "Badges" }
+                    )
+                    NavigationBarItem(
                         icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
                         label = { Text("Settings") },
                         selected = selectedTab == "Settings",
@@ -92,9 +115,11 @@ fun UtilityApp(viewModel: TimerViewModel = viewModel()) {
         ) { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 when (selectedTab) {
-                    "Utility" -> UtilityScreen(viewModel)
+                    "Utility"  -> UtilityScreen(timerViewModel)
+                    "Account"  -> AccountScreen(accountViewModel)
+                    "Badges"   -> BadgesScreen(accountViewModel)
                     "Settings" -> SettingsScreen(
-                        viewModel = viewModel,
+                        viewModel = timerViewModel,
                         isDarkMode = isDarkMode,
                         onDarkModeToggle = { isDarkMode = it }
                     )
